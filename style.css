@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'Sensory';
-    src: url('/fonts/SENSORYSansVF.ttf') format('truetype');
+    src: url('./fonts/SENSORYSansVF.ttf') format('truetype');
 }
 
 * {
