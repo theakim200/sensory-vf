@@ -66,21 +66,21 @@ textInput.addEventListener('beforeinput', (event) => {
     const range = selection.getRangeAt(0);
     range.deleteContents();
     
-    // 각 글자를 span으로 감싸서 삽입
-    const fragment = document.createDocumentFragment();
-    
+    // 각 글자를 span으로 감싸서 생성
     for (let char of text) {
         const span = document.createElement('span');
         span.textContent = char;
         span.style.fontVariationSettings = `'wght' 90, 'wdth' 100, 'ital' ${currentItalicValue}`;
-        fragment.appendChild(span);
+        
+        // span을 현재 위치에 삽입
+        range.insertNode(span);
+        
+        // 커서를 삽입된 span 뒤로 이동
+        range.setStartAfter(span);
+        range.setEndAfter(span);
     }
     
-    // 삽입
-    range.insertNode(fragment);
-    
-    // 커서를 삽입된 텍스트 끝으로 이동
-    range.setStartAfter(fragment.lastChild);
+    // 커서 위치 확정 (선택 없이)
     range.collapse(true);
     selection.removeAllRanges();
     selection.addRange(range);
