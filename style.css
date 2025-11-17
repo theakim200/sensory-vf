@@ -66,8 +66,17 @@ body {
     font-size: 48px;
     border: none;
     outline: none;
-    resize: none;
-    font-variation-settings: 'wght' 90, 'wdth' 100, 'ital' 50;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+#text-input:empty:before {
+    content: attr(data-placeholder);
+    color: #ccc;
+}
+
+#text-input span {
+    font-family: 'Sensory', sans-serif;
 }
 
 #debug-info {
