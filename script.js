@@ -46,95 +46,42 @@ function handleOrientation(event) {
     }
 }
 
-// 텍스트 입력 처리
-textInput.addEventListener('input', handleInput);
-
-function handleInput(event) {
-    // 현재 커서 위치 저장
+// beforeinput 이벤트로 새 글자만 감지
+textInput.addEventListener('beforeinput', (event) => {
+    // 일반 텍스트 입력이 아니면 무시
+    if (event.inputType !== 'insertText' && event.inputType !== 'insertLineBreak') {
+        return;
+    }
+    
+    // 기본 동작 막기
+    event.preventDefault();
+    
+    // 입력될 텍스트 가져오기
+    const text = event.data || '\n';
+    
+    // 현재 선택 영역 가져오기
     const selection = window.getSelection();
+    if (!selection.rangeCount) return;
+    
     const range = selection.getRangeAt(0);
-    const cursorOffset = getCursorOffset(textInput, range);
+    range.deleteContents();
     
-    // 모든 텍스트 노드를 span으로 감싸기
-    processTextNodes(textInput);
+    // 각 글자를 span으로 감싸서 삽입
+    const fragment = document.createDocumentFragment();
     
-    // 커서 위치 복원
-    restoreCursor(textInput, cursorOffset);
-}
-
-function processTextNodes(element) {
-    const walker = document.createTreeWalker(
-        element,
-        NodeFilter.SHOW_TEXT,
-        null
-    );
-    
-    const textNodes = [];
-    let node;
-    while (node = walker.nextNode()) {
-        if (node.textContent.trim() !== '') {
-            textNodes.push(node);
-        }
+    for (let char of text) {
+        const span = document.createElement('span');
+        span.textContent = char;
+        span.style.fontVariationSettings = `'wght' 90, 'wdth' 100, 'ital' ${currentItalicValue}`;
+        fragment.appendChild(span);
     }
     
-    textNodes.forEach(textNode => {
-        const text = textNode.textContent;
-        const fragment = document.createDocumentFragment();
-        
-        for (let char of text) {
-            const span = document.createElement('span');
-            span.textContent = char;
-            
-            // 이미 span으로 감싸진 것이 아닌 새 글자만 현재 italic 값 적용
-            if (!textNode.parentElement || textNode.parentElement.tagName !== 'SPAN') {
-                span.style.fontVariationSettings = `'wght' 90, 'wdth' 100, 'ital' ${currentItalicValue}`;
-            }
-            
-            fragment.appendChild(span);
-        }
-        
-        textNode.parentNode.replaceChild(fragment, textNode);
-    });
-}
-
-function getCursorOffset(element, range) {
-    const preRange = range.cloneRange();
-    preRange.selectNodeContents(element);
-    preRange.setEnd(range.endContainer, range.endOffset);
-    return preRange.toString().length;
-}
-
-function restoreCursor(element, offset) {
-    const selection = window.getSelection();
-    const range = document.createRange();
+    // 삽입
+    range.insertNode(fragment);
     
-    let charCount = 0;
-    let found = false;
-    
-    function searchNode(node) {
-        if (found) return;
-        
-        if (node.nodeType === Node.TEXT_NODE) {
-            const length = node.textContent.length;
-            if (charCount + length >= offset) {
-                range.setStart(node, offset - charCount);
-                range.collapse(true);
-                found = true;
-                return;
-            }
-            charCount += length;
-        } else {
-            for (let child of node.childNodes) {
-                searchNode(child);
-                if (found) return;
-            }
-        }
-    }
-    
-    searchNode(element);
-    
-    if (found) {
-        selection.removeAllRanges();
-        selection.addRange(range);
-    }
-}
+    // 커서를 삽입된 텍스트 끝으로 이동
+    range.setStartAfter(fragment.lastChild);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+});
