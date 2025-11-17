@@ -14,6 +14,7 @@ body {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
+    margin-top: 20px;
 }
 
 #permission-overlay {
@@ -81,8 +82,9 @@ body {
 
 #debug-info {
     position: fixed;
-    bottom: 10px;
+    top: 10px;
     left: 10px;
     font-size: 12px;
     color: gray;
+    z-index: 100;
 }
