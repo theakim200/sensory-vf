@@ -70,7 +70,8 @@ textInput.addEventListener('beforeinput', (event) => {
     
     // 타자 간격을 width 값으로 변환 (역방향: 빠를수록 작은 값)
     // 100ms 이하 = width 10 (condensed)
-    // 800ms 이상 = width 100 (normal)
+    // 450ms 정도 = width 100 (normal)
+    // 800ms 이상 = width 190 (expanded)
     if (typingInterval === 0) {
         // 첫 글자
         currentWidthValue = 100;
@@ -79,9 +80,9 @@ textInput.addEventListener('beforeinput', (event) => {
         currentWidthValue = 100;
     } else {
         // 타자 간격을 width로 매핑 (역방향)
-        // 빠름(100ms) → 10, 느림(800ms) → 100
+        // 빠름(100ms) → 10, 보통(450ms) → 100, 느림(800ms) → 190
         const normalized = Math.max(100, Math.min(800, typingInterval));
-        currentWidthValue = ((normalized - 100) / 700) * 90 + 10;
+        currentWidthValue = ((normalized - 100) / 700) * 180 + 10;
     }
     
     // 입력될 텍스트 가져오기
