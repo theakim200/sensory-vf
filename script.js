@@ -4,6 +4,8 @@ const textInput = document.getElementById('text-input');
 const debugInfo = document.getElementById('debug-info');
 
 let currentItalicValue = 50; // 현재 italic 값 저장
+let currentWidthValue = 100; // 현재 width 값 저장
+let lastInputTime = null; // 이전 입력 시간
 
 // 권한 요청 버튼 클릭
 grantButton.addEventListener('click', async () => {
@@ -42,7 +44,7 @@ function handleOrientation(event) {
         currentItalicValue = Math.max(0, Math.min(100, italicValue));
         
         // 디버그 정보 표시
-        debugInfo.textContent = `gamma: ${gamma.toFixed(1)}° | italic: ${currentItalicValue.toFixed(1)}`;
+        debugInfo.textContent = `gamma: ${gamma.toFixed(1)}° | italic: ${currentItalicValue.toFixed(1)} | width: ${currentWidthValue.toFixed(1)}`;
     }
 }
 
@@ -55,6 +57,32 @@ textInput.addEventListener('beforeinput', (event) => {
     
     // 기본 동작 막기
     event.preventDefault();
+    
+    // 타자 속도 측정
+    const currentTime = Date.now();
+    let typingInterval = 0;
+    
+    if (lastInputTime !== null) {
+        typingInterval = currentTime - lastInputTime;
+    }
+    
+    lastInputTime = currentTime;
+    
+    // 타자 간격을 width 값으로 변환 (역방향: 빠를수록 작은 값)
+    // 100ms 이하 = width 10 (condensed)
+    // 800ms 이상 = width 100 (normal)
+    if (typingInterval === 0) {
+        // 첫 글자
+        currentWidthValue = 100;
+    } else if (typingInterval > 2000) {
+        // 2초 이상 정지 = 새로운 단어
+        currentWidthValue = 100;
+    } else {
+        // 타자 간격을 width로 매핑 (역방향)
+        // 빠름(100ms) → 10, 느림(800ms) → 100
+        const normalized = Math.max(100, Math.min(800, typingInterval));
+        currentWidthValue = ((normalized - 100) / 700) * 90 + 10;
+    }
     
     // 입력될 텍스트 가져오기
     const text = event.data || '\n';
@@ -70,7 +98,7 @@ textInput.addEventListener('beforeinput', (event) => {
     for (let char of text) {
         const span = document.createElement('span');
         span.textContent = char;
-        span.style.fontVariationSettings = `'wght' 90, 'wdth' 100, 'ital' ${currentItalicValue}`;
+        span.style.fontVariationSettings = `'wght' 90, 'wdth' ${currentWidthValue}, 'ital' ${currentItalicValue}`;
         
         // span을 현재 위치에 삽입
         range.insertNode(span);
