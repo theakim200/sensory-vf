@@ -7,6 +7,11 @@ let currentItalicValue = 50; // 현재 italic 값 저장
 let currentWidthValue = 100; // 현재 width 값 저장
 let lastInputTime = null; // 이전 입력 시간
 
+// force 지원 여부 확인
+if ('force' in Touch.prototype) {
+    console.log('Force supported!');
+}
+
 // 권한 요청 버튼 클릭
 grantButton.addEventListener('click', async () => {
     // iOS 13+ 권한 요청
