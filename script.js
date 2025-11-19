@@ -37,11 +37,12 @@ function handleOrientation(event) {
     const gamma = event.gamma; // 좌우 기울기: -90 ~ +90
     
     if (gamma !== null) {
-        // gamma를 italic axis 값으로 변환 (0-100)
-        const italicValue = ((gamma + 90) / 180) * 100;
+        // gamma를 italic axis 값으로 변환 (15-85 범위)
+        // gamma -90° → italic 15, gamma 0° → italic 50, gamma +90° → italic 85
+        const italicValue = ((gamma + 90) / 180) * 70 + 15;
         
         // 범위 제한
-        currentItalicValue = Math.max(0, Math.min(100, italicValue));
+        currentItalicValue = Math.max(15, Math.min(85, italicValue));
         
         // 디버그 정보 표시
         debugInfo.textContent = `gamma: ${gamma.toFixed(1)}° | italic: ${currentItalicValue.toFixed(1)} | width: ${currentWidthValue.toFixed(1)}`;
@@ -68,21 +69,24 @@ textInput.addEventListener('beforeinput', (event) => {
     
     lastInputTime = currentTime;
     
-    // 타자 간격을 width 값으로 변환 (역방향: 빠를수록 작은 값)
-    // 100ms 이하 = width 10 (condensed)
-    // 450ms 정도 = width 100 (normal)
-    // 800ms 이상 = width 190 (expanded)
+    // 타자 간격을 width 값으로 변환 (15-85 범위)
+    // < 100ms = width 15 (condensed)
+    // 100-200ms = width 16-39
+    // 200-400ms = width 40-60
+    // 400-800ms = width 61-84
+    // > 800ms = width 85 (expanded)
     if (typingInterval === 0) {
         // 첫 글자
-        currentWidthValue = 100;
-    } else if (typingInterval > 2000) {
-        // 2초 이상 정지 = 새로운 단어
-        currentWidthValue = 100;
+        currentWidthValue = 50;
+    } else if (typingInterval < 100) {
+        // 매우 빠름
+        currentWidthValue = 15;
+    } else if (typingInterval > 800) {
+        // 매우 느림
+        currentWidthValue = 85;
     } else {
-        // 타자 간격을 width로 매핑 (역방향)
-        // 빠름(100ms) → 10, 보통(450ms) → 100, 느림(800ms) → 190
-        const normalized = Math.max(100, Math.min(800, typingInterval));
-        currentWidthValue = ((normalized - 100) / 700) * 180 + 10;
+        // 100-800ms 사이를 15-85로 선형 매핑
+        currentWidthValue = 15 + ((typingInterval - 100) / 700) * 70;
     }
     
     // 입력될 텍스트 가져오기
