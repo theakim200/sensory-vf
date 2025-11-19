@@ -7,32 +7,22 @@ let currentItalicValue = 50; // 현재 italic 값 저장
 let currentWidthValue = 100; // 현재 width 값 저장
 let lastInputTime = null; // 이전 입력 시간
 
-console.log('=== 전체 화면 터치 테스트 ===');
+console.log('=== 키보드 타이핑 압력 테스트 ===');
 
-// body 전체에 리스너
+let keyPressForce = 0;
+
+// 화면 터치로 압력 업데이트
 document.body.addEventListener('touchstart', function(event) {
-    const touch = event.touches[0];
-    console.log('body 터치! force:', touch.force);
+    keyPressForce = event.touches[0].force;
+    console.log('현재 압력:', keyPressForce);
 });
 
-// textInput div에 리스너
-textInput.addEventListener('touchstart', function(event) {
-    const touch = event.touches[0];
-    console.log('textInput 터치! force:', touch.force);
+// 키보드 입력 감지
+textInput.addEventListener('beforeinput', function(event) {
+    console.log('키 입력됨! 마지막 압력:', keyPressForce);
 });
 
-// permission overlay에 리스너 (아직 있다면)
-if (permissionOverlay) {
-    permissionOverlay.addEventListener('touchstart', function(event) {
-        const touch = event.touches[0];
-        console.log('overlay 터치! force:', touch.force);
-    });
-}
-
-console.log('이제 화면 여러 곳을 눌러보세요:');
-console.log('1. 텍스트 입력 영역');
-console.log('2. 화면 빈 공간');
-console.log('3. 버튼 (있다면)');
+console.log('테스트: 화면을 누르면서 동시에 키보드 타이핑해보세요');
 
 // 권한 요청 버튼 클릭
 grantButton.addEventListener('click', async () => {
