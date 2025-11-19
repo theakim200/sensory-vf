@@ -35,17 +35,26 @@ function startOrientationTracking() {
 // 방향 센서 처리
 function handleOrientation(event) {
     const gamma = event.gamma; // 좌우 기울기: -90 ~ +90
+    const beta = event.beta;   // 앞뒤 기울기: -180 ~ 180
     
-    if (gamma !== null) {
-        // gamma를 italic axis 값으로 변환 (15-85 범위)
+    if (gamma !== null && beta !== null) {
+        // 화면이 뒤를 향하는지 확인하고 gamma 보정
+        let correctedGamma = gamma;
+        
+        if (beta > 90 || beta < -90) {
+            // 화면이 뒤를 향함 (뒤집힌 상태) → gamma 부호 반전
+            correctedGamma = -gamma;
+        }
+        
+        // correctedGamma를 italic axis 값으로 변환 (15-85 범위)
         // gamma -90° → italic 15, gamma 0° → italic 50, gamma +90° → italic 85
-        const italicValue = ((gamma + 90) / 180) * 70 + 15;
+        const italicValue = ((correctedGamma + 90) / 180) * 70 + 15;
         
         // 범위 제한
         currentItalicValue = Math.max(15, Math.min(85, italicValue));
         
         // 디버그 정보 표시
-        debugInfo.textContent = `gamma: ${gamma.toFixed(1)}° | italic: ${currentItalicValue.toFixed(1)} | width: ${currentWidthValue.toFixed(1)}`;
+        debugInfo.textContent = `gamma: ${gamma.toFixed(1)}° | beta: ${beta.toFixed(1)}° | italic: ${currentItalicValue.toFixed(1)} | width: ${currentWidthValue.toFixed(1)}`;
     }
 }
 
