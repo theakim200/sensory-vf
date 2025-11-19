@@ -42,14 +42,17 @@ body {
 #permission-box p {
     margin-bottom: 20px;
     font-size: 16px;
+    font-variation-settings: 'wght' 100, 'wdth' 50, 'ital' 50;
 }
 
 #grant-permission {
+    font-family: 'Sensory', sans-serif;
     padding: 10px 20px;
     font-size: 16px;
     border: 1px solid black;
     background: white;
     cursor: pointer;
+    font-variation-settings: 'wght' 90, 'wdth' 50, 'ital' 50;
 }
 
 #main-content {
@@ -69,6 +72,7 @@ body {
     outline: none;
     overflow-wrap: break-word;
     white-space: pre-wrap;
+    font-variation-settings: 'wght' 100, 'wdth' 50, 'ital' 50;
 }
 
 #text-input:empty:before {
@@ -87,4 +91,5 @@ body {
     font-size: 12px;
     color: gray;
     z-index: 100;
+    font-variation-settings: 'wght' 100, 'wdth' 50, 'ital' 50;
 }
