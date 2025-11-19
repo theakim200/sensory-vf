@@ -7,10 +7,45 @@ let currentItalicValue = 50; // 현재 italic 값 저장
 let currentWidthValue = 100; // 현재 width 값 저장
 let lastInputTime = null; // 이전 입력 시간
 
-// force 지원 여부 확인
-if ('force' in Touch.prototype) {
-    console.log('Force supported!');
+// Force Touch 지원 여부 확인
+console.log('=== Force Touch 지원 확인 ===');
+
+// 1. Touch 객체 존재 확인
+if (typeof Touch !== 'undefined') {
+    console.log('✅ Touch 객체 존재');
+    
+    // 2. force 속성 존재 확인
+    if ('force' in Touch.prototype) {
+        console.log('✅ touch.force 속성 지원됨!');
+    } else {
+        console.log('❌ touch.force 속성 없음 (API 미지원)');
+    }
+} else {
+    console.log('❌ Touch 객체 자체가 없음 (터치 기기 아님)');
 }
+
+// 3. 실제 터치 이벤트에서 테스트
+document.addEventListener('touchstart', function(event) {
+    const touch = event.touches[0];
+    
+    console.log('--- 터치 감지됨 ---');
+    console.log('touch.force 값:', touch.force);
+    console.log('touch.force 타입:', typeof touch.force);
+    
+    if (touch.force === undefined) {
+        console.log('❌ touch.force가 undefined (완전 미지원)');
+    } else if (touch.force === 0) {
+        console.log('⚠️ touch.force = 0 (지원하지만 압력 감지 안됨)');
+    } else {
+        console.log('✅ 압력 감지됨! 값:', touch.force);
+    }
+    
+    // 추가 정보
+    console.log('radiusX:', touch.radiusX);
+    console.log('radiusY:', touch.radiusY);
+}, { once: true }); // 첫 터치만 확인
+
+console.log('화면을 터치해서 압력 센서를 테스트하세요');
 
 // 권한 요청 버튼 클릭
 grantButton.addEventListener('click', async () => {
