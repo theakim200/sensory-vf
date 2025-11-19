@@ -7,23 +7,6 @@ let currentItalicValue = 50; // 현재 italic 값 저장
 let currentWidthValue = 100; // 현재 width 값 저장
 let lastInputTime = null; // 이전 입력 시간
 
-console.log('=== 키보드 타이핑 압력 테스트 ===');
-
-let keyPressForce = 0;
-
-// 화면 터치로 압력 업데이트
-document.body.addEventListener('touchstart', function(event) {
-    keyPressForce = event.touches[0].force;
-    console.log('현재 압력:', keyPressForce);
-});
-
-// 키보드 입력 감지
-textInput.addEventListener('beforeinput', function(event) {
-    console.log('키 입력됨! 마지막 압력:', keyPressForce);
-});
-
-console.log('테스트: 화면을 누르면서 동시에 키보드 타이핑해보세요');
-
 // 권한 요청 버튼 클릭
 grantButton.addEventListener('click', async () => {
     // iOS 13+ 권한 요청
@@ -52,19 +35,28 @@ function startOrientationTracking() {
 // 방향 센서 처리
 function handleOrientation(event) {
     const gamma = event.gamma; // 좌우 기울기: -90 ~ +90
+    const beta = event.beta;   // 앞뒤 기울기: -180 ~ 180
     
-    if (gamma !== null) {
-        // gamma를 italic axis 값으로 변환 (15-85 범위)
-        // gamma -90° → italic 15, gamma 0° → italic 50, gamma +90° → italic 85
-        // const italicValue = ((gamma + 90) / 180) * 70 + 15;
-        const italicValue = ((gamma + 90) / 180) * 30 + 35;
+    if (gamma !== null && beta !== null) {
+        // 화면이 뒤를 향하는지 확인하고 gamma 보정
+        let correctedGamma = gamma;
         
-        // 범위 제한
+        if (beta > 90 || beta < -90) {
+            // 화면이 뒤를 향함 (뒤집힌 상태) → gamma 부호 반전
+            correctedGamma = -gamma;
+        }
+        
+        // correctedGamma를 italic axis 값으로 변환 (15-85 범위)
+        const italicValue = ((gamma + 90) / 180) * 70 + 15;
+currentItalicValue = Math.max(35, Math.min(65, italicValue));
+        // // gamma -90° → italic 15, gamma 0° → italic 50, gamma +90° → italic 85
+        // const italicValue = ((correctedGamma + 90) / 180) * 70 + 15;
+        
+        // // 범위 제한
         // currentItalicValue = Math.max(15, Math.min(85, italicValue));
-        currentItalicValue = Math.max(35, Math.min(65, italicValue));
         
         // 디버그 정보 표시
-        debugInfo.textContent = `gamma: ${gamma.toFixed(1)}° | italic: ${currentItalicValue.toFixed(1)} | width: ${currentWidthValue.toFixed(1)}`;
+        debugInfo.textContent = `gamma: ${gamma.toFixed(1)}° | beta: ${beta.toFixed(1)}° | italic: ${currentItalicValue.toFixed(1)} | width: ${currentWidthValue.toFixed(1)}`;
     }
 }
 
