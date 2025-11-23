@@ -47,13 +47,11 @@ function handleOrientation(event) {
         }
         
         // correctedGamma를 italic axis 값으로 변환 (15-85 범위)
-        const italicValue = ((gamma + 90) / 180) * 70 + 15;
-currentItalicValue = Math.max(35, Math.min(65, italicValue));
         // // gamma -90° → italic 15, gamma 0° → italic 50, gamma +90° → italic 85
-        // const italicValue = ((correctedGamma + 90) / 180) * 70 + 15;
+        const italicValue = ((correctedGamma + 90) / 180) * 20 + 40;
         
         // // 범위 제한
-        // currentItalicValue = Math.max(15, Math.min(85, italicValue));
+        currentItalicValue = Math.max(40, Math.min(60, italicValue));
         
         // 디버그 정보 표시
         debugInfo.textContent = `gamma: ${gamma.toFixed(1)}° | beta: ${beta.toFixed(1)}° | italic: ${currentItalicValue.toFixed(1)} | width: ${currentWidthValue.toFixed(1)}`;
