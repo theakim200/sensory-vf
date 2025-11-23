@@ -5,6 +5,7 @@ const debugInfo = document.getElementById('debug-info');
 
 let currentItalicValue = 50; // 현재 italic 값 저장
 let currentWidthValue = 100; // 현재 width 값 저장
+let currentWeightValue = 105; // 현재 weight 값 저장 (60-150)
 let lastInputTime = null; // 이전 입력 시간
 
 // 권한 요청 버튼 클릭
@@ -26,11 +27,6 @@ grantButton.addEventListener('click', async () => {
         permissionOverlay.classList.add('hidden');
     }
 });
-
-// 방향 센서 추적 시작
-function startOrientationTracking() {
-    window.addEventListener('deviceorientation', handleOrientation);
-}
 
 // 방향 센서 처리
 function handleOrientation(event) {
@@ -97,6 +93,9 @@ textInput.addEventListener('beforeinput', (event) => {
         // 100-1200ms 사이를 15-85로 선형 매핑
         currentWidthValue = 5 + ((typingInterval - 100) / (1200 - 100)) * 80;
     }
+    
+    // 디버그 정보 업데이트 (타자 간격 포함)
+    debugInfo.textContent = `gamma: ${(currentItalicValue - 50).toFixed(1)}° | italic: ${currentItalicValue.toFixed(1)} | interval: ${typingInterval}ms | width: ${currentWidthValue.toFixed(1)}`;
     
     // 입력될 텍스트 가져오기
     const text = event.data || '\n';
