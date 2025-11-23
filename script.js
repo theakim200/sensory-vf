@@ -90,12 +90,12 @@ textInput.addEventListener('beforeinput', (event) => {
     } else if (typingInterval < 100) {
         // 매우 빠름
         currentWidthValue = 5;
-    } else if (typingInterval > 800) {
+    } else if (typingInterval > 1200) {
         // 매우 느림
         currentWidthValue = 85;
     } else {
-        // 100-800ms 사이를 15-85로 선형 매핑
-        currentWidthValue = 5 + ((typingInterval - 100) / (800 - 100)) * 80;
+        // 100-1200ms 사이를 15-85로 선형 매핑
+        currentWidthValue = 5 + ((typingInterval - 100) / (1200 - 100)) * 80;
     }
     
     // 입력될 텍스트 가져오기
