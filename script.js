@@ -28,6 +28,11 @@ grantButton.addEventListener('click', async () => {
     }
 });
 
+// 방향 센서 추적 시작
+function startOrientationTracking() {
+    window.addEventListener('deviceorientation', handleOrientation);
+}
+
 // 방향 센서 처리
 function handleOrientation(event) {
     const gamma = event.gamma; // 좌우 기울기: -90 ~ +90
@@ -43,10 +48,10 @@ function handleOrientation(event) {
         }
         
         // correctedGamma를 italic axis 값으로 변환 (15-85 범위)
-        // // gamma -90° → italic 15, gamma 0° → italic 50, gamma +90° → italic 85
+        // gamma -90° → italic 15, gamma 0° → italic 50, gamma +90° → italic 85
         const italicValue = ((correctedGamma + 90) / 180) * 20 + 40;
         
-        // // 범위 제한
+        // 범위 제한
         currentItalicValue = Math.max(40, Math.min(60, italicValue));
         
         // 디버그 정보 표시
