@@ -5,8 +5,8 @@ const debugInfo = document.getElementById('debug-info');
 
 let currentItalicValue = 50; // 현재 italic 값 저장
 let currentWidthValue = 100; // 현재 width 값 저장
-let currentWeightValue = 105; // 현재 weight 값 저장 (60-150)
 let lastInputTime = null; // 이전 입력 시간
+let currentTypingSpeed = 0; // 현재 타자 속도 (ms)
 
 // 권한 요청 버튼 클릭
 grantButton.addEventListener('click', async () => {
@@ -47,15 +47,15 @@ function handleOrientation(event) {
             correctedGamma = -gamma;
         }
         
-        // correctedGamma를 italic axis 값으로 변환 (15-85 범위)
-        // gamma -90° → italic 15, gamma 0° → italic 50, gamma +90° → italic 85
+        // correctedGamma를 italic axis 값으로 변환 (40-60 범위)
+        // gamma -90° → italic 40, gamma 0° → italic 50, gamma +90° → italic 60
         const italicValue = ((correctedGamma + 90) / 180) * 20 + 40;
         
         // 범위 제한
         currentItalicValue = Math.max(40, Math.min(60, italicValue));
         
         // 디버그 정보 표시
-        debugInfo.textContent = `gamma: ${gamma.toFixed(1)}° | beta: ${beta.toFixed(1)}° | italic: ${currentItalicValue.toFixed(1)} | width: ${currentWidthValue.toFixed(1)}`;
+        debugInfo.textContent = `gamma: ${gamma.toFixed(1)}° | beta: ${beta.toFixed(1)}° | italic: ${currentItalicValue.toFixed(1)} | speed: ${currentTypingSpeed}ms | width: ${currentWidthValue.toFixed(1)}`;
     }
 }
 
@@ -78,13 +78,11 @@ textInput.addEventListener('beforeinput', (event) => {
     }
     
     lastInputTime = currentTime;
+    currentTypingSpeed = typingInterval; // 디버그용 저장
     
-    // 타자 간격을 width 값으로 변환 (15-85 범위)
-    // < 100ms = width 15 (condensed)
-    // 100-200ms = width 16-39
-    // 200-400ms = width 40-60
-    // 400-800ms = width 61-84
-    // > 800ms = width 85 (expanded)
+    // 타자 간격을 width 값으로 변환 (5-85 범위)
+    // < 100ms = width 5 (condensed)
+    // > 1200ms = width 85 (expanded)
     if (typingInterval === 0) {
         // 첫 글자
         currentWidthValue = 50;
@@ -95,12 +93,12 @@ textInput.addEventListener('beforeinput', (event) => {
         // 매우 느림
         currentWidthValue = 85;
     } else {
-        // 100-1200ms 사이를 15-85로 선형 매핑
+        // 100-1200ms 사이를 5-85로 선형 매핑
         currentWidthValue = 5 + ((typingInterval - 100) / (1200 - 100)) * 80;
     }
     
-    // 디버그 정보 업데이트 (타자 간격 포함)
-    debugInfo.textContent = `gamma: ${(currentItalicValue - 50).toFixed(1)}° | italic: ${currentItalicValue.toFixed(1)} | interval: ${typingInterval}ms | width: ${currentWidthValue.toFixed(1)}`;
+    // 디버그 정보 업데이트
+    debugInfo.textContent = `gamma: ${currentItalicValue.toFixed(1)}° | italic: ${currentItalicValue.toFixed(1)} | speed: ${currentTypingSpeed}ms | width: ${currentWidthValue.toFixed(1)}`;
     
     // 입력될 텍스트 가져오기
     const text = event.data || '\n';
